@@ -20,7 +20,7 @@ The system is decoupled into modular components to ensure maintainability:
 2.  **Hybrid Inference Engine**: Implemented a "Safe-First" logic gate that bypasses the Random Forest for obvious threats (e.g., raw IP detection), mitigating hallucinations on obfuscated links.
 
 ### 🚀 Live Demo
-[Access the PhishDetector Inference Dashboard](INSERT_YOUR_URL_HERE)
+[Access the PhishDetector Inference Dashboard]((https://phising-classifier-gv2x9caobn28rgefhuhqxf.streamlit.app/))
 
 ### 💻 Local Setup & Installation
 ```bash
