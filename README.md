@@ -3,6 +3,8 @@
 ### 📌 Project Overview
 PhishDetector is an enterprise-grade, zero-latency machine learning pipeline designed to classify malicious phishing URLs. Developed to simulate a production-ready environment, this project focuses on **System Latency Optimization** and **Separation of Concerns (SoC)**, enabling structural domain feature analysis in milliseconds without reliance on bottlenecked external APIs.
 
+![PhishDetector UI](phishdetector_ui.png)
+
 ### 📊 Model Performance & Evaluation
 * **Baseline Validation Accuracy (~95-99%)**: Achieved on a hold-out test set, scrutinized via Confusion Matrix analysis to ensure robustness.
 * **False Positive Mitigation (High Precision)**: Utilized `predict_proba` threshold calibration to prioritize Precision, minimizing operational disruption in enterprise environments.
