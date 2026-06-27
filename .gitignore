@@ -1,0 +1,1 @@
+Virtual Environmentvenv/env/.envPython Cachepycache/*.pyc*.pyoStreamlit Cache.streamlit/! .streamlit/config.toml  # Keep the config file for the white theme!OS Files.DS_StoreThumbs.db
