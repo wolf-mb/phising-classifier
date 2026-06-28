@@ -1,5 +1,37 @@
-🛡️ PhishDetector: Real-Time Malicious Domain Inference Engine📌 Project OverviewPhishDetector is an enterprise-grade, zero-latency machine learning pipeline designed to classify malicious phishing URLs. Built with a focus on System Latency Optimization and Separation of Concerns (SoC), the application evaluates structural domain features in milliseconds without relying on bottlenecked external API calls (like WHOIS or DNS lookups).📊 Model Performance & EvaluationIn cybersecurity ML, raw accuracy often masks overfitting or data leakage. Therefore, this pipeline was evaluated with a strict focus on Generalizability and the Precision-Recall Trade-off.Baseline Validation Accuracy (~95-99%): Achieved on a hold-out test set. While high, this baseline was heavily scrutinized via Confusion Matrix analysis to ensure the model wasn't simply memorizing training data.False Positive Mitigation (High Precision): In enterprise environments, blocking legitimate domains (e.g., Flipkart, Google) causes severe operational disruption. The pipeline utilizes threshold tuning via predict_proba to heavily bias toward Precision on unknown links.Overfitting Prevention: By restricting the Random Forest to purely lexical structural features (and dropping transient network states), the model establishes rigid mathematical decision boundaries rather than overfitting to temporary data artifacts.Heuristic Catch Rate (100%): A hard-coded safety override guarantees absolute detection of zero-day raw IP threats and insecure HTTP protocols, perfectly covering the statistical model's natural blind spots.🏗️ System ArchitectureTo simulate a production-ready environment, the system is divided into decoupled micro-modules:src/pipeline/training_pipeline.py: Handles data ingestion, preprocessing (via DataTransformer), and trains a Random Forest Classifier.src/pipeline/prediction_pipeline.py: A standalone inference engine. It applies a Heuristic Safety Override for critical threats and delegates complex pattern recognition to the ML model.app.py: A lightweight Streamlit frontend that purely handles UI rendering, maintaining strict separation from the mathematical logic.🧠 Machine Learning & Engineering Trade-offs1. Training-Serving Skew MitigationThe original dataset contained 30 features. To ensure zero-lag user experience, the live inference engine was optimized to strictly evaluate features that can be extracted via pure string manipulation in real-time.2. The Hybrid Inference EngineStatistical models can hallucinate on heavily obfuscated edge cases. This pipeline implements a production-style "Safe-First / Threat-First" logic gate prior to ML inference. If a raw IP address is detected in the hostname, it bypasses the Random Forest entirely to trigger an immediate threat alert.🚀 Live Demo[Insert your Streamlit Community Cloud or Hugging Face URL here once deployed]💻 Local Setup & InstallationClone the repository:git clone [https://github.com/wolf-mb/phishing-classifier.git](https://github.com/wolf-mb/phishing-classifier.git)
-cd phishing-classifier
-Install dependencies:pip install -r requirements.txt
-Launch the Inference Dashboard:python -m streamlit run app.py
-🛠️ Tech StackAlgorithm: Random Forest ClassifierFrontend / UI: Streamlit (with custom CSS injection)Data Manipulation: Pandas, NumPyFeature Extraction: RegEx, urllib
+# 🛡️ PhishDetector: Real-Time Malicious Domain Inference Engine
+
+### 📌 Project Overview
+PhishDetector is an enterprise-grade, zero-latency machine learning pipeline designed to classify malicious phishing URLs. Developed to simulate a production-ready environment, this project focuses on **System Latency Optimization** and **Separation of Concerns (SoC)**, enabling structural domain feature analysis in milliseconds without reliance on bottlenecked external APIs.
+
+![PhishDetector UI](phishdetector_ui.png)
+
+### 📊 Model Performance & Evaluation
+* **Baseline Validation Accuracy (~95-99%)**: Achieved on a hold-out test set, scrutinized via Confusion Matrix analysis to ensure robustness.
+* **False Positive Mitigation (High Precision)**: Utilized `predict_proba` threshold calibration to prioritize Precision, minimizing operational disruption in enterprise environments.
+* **Overfitting Prevention**: The model relies on rigid lexical structural features, establishing mathematical decision boundaries rather than memorizing transient data artifacts.
+* **Heuristic Catch Rate (100%)**: A hard-coded "Safe-First" safety override guarantees detection of zero-day raw IP threats and insecure HTTP protocols, covering the model's blind spots.
+
+### 🏗️ System Architecture
+The system is decoupled into modular components to ensure maintainability:
+* **`src/pipeline/training_pipeline.py`**: Manages data ingestion, preprocessing (via `DataTransformer`), and model training.
+* **`src/pipeline/prediction_pipeline.py`**: A standalone inference engine implementing the **Heuristic Safety Override** for critical threats.
+* **`app.py`**: A lightweight [Streamlit](https://streamlit.io/) frontend, kept entirely separate from the core mathematical logic.
+
+### 🧠 Engineering & ML Trade-offs
+1.  **Training-Serving Skew Mitigation**: Optimized for sub-millisecond inference by restricting inputs to features extractable via pure string manipulation.
+2.  **Hybrid Inference Engine**: Implemented a "Safe-First" logic gate that bypasses the Random Forest for obvious threats (e.g., raw IP detection), mitigating hallucinations on obfuscated links.
+
+### 🚀 Live Demo
+(https://phising-classifier-gv2x9caobn28rgefhuhqxf.streamlit.app/)
+
+### 💻 Local Setup & Installation
+```bash
+# Clone the repository
+git clone [https://github.com/wolf-mb/phising-classifier.git](https://github.com/wolf-mb/phising-classifier.git)
+cd phising-classifier
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch the Inference Dashboard
+python -m streamlit run app.py
