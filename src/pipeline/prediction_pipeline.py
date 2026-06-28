@@ -10,7 +10,17 @@ SHORTENER_DOMAINS = {
     "is.gd", "buff.ly", "adf.ly", "shorte.st", "rb.gy",
     "cutt.ly", "shorturl.at", "tiny.cc", "x.co"
 }
-
+def normalize_url(url: str) -> str:
+    """
+    Ensures URL has a scheme so urlparse works correctly.
+    youtube.com        → https://youtube.com
+    http://youtube.com → http://youtube.com  (unchanged)
+    https://youtube.com → https://youtube.com (unchanged)
+    """
+    url = url.strip()
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+    return url
 class PredictionPipeline:
     """
     Handles live URL feature extraction and model inference.
@@ -34,6 +44,7 @@ class PredictionPipeline:
         Training selected_indices = [0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 17, 18]
         Returns shape (1, 12).
         """
+        url = normalize_url(url)
         parsed = urlparse(url)
         domain = parsed.netloc.lower()
 
@@ -106,7 +117,7 @@ class PredictionPipeline:
         """
         if self.model is None:
             raise FileNotFoundError("model.pkl not found. Run training pipeline first.")
-
+        url = normalize_url(url)
         parsed = urlparse(url)
         domain = parsed.netloc.lower().split(':')[0]
 

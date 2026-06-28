@@ -5,6 +5,18 @@ import re
 import os
 from urllib.parse import urlparse
 
+def normalize_url(url: str) -> str:
+    """
+    Ensures URL has a scheme so urlparse works correctly.
+    youtube.com        → https://youtube.com
+    http://youtube.com → http://youtube.com  (unchanged)
+    https://youtube.com → https://youtube.com (unchanged)
+    """
+    url = url.strip()
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+    return url
+
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(page_title="PHISHDETECTOR", page_icon="🎣", layout="centered")
 
@@ -80,6 +92,7 @@ def extract_url_features(url: str) -> np.ndarray:
     UCI convention: 1 = phishing signal, -1 = legitimate signal
     Returns shape (1, 12).
     """
+    url = normalize_url(url) 
     parsed = urlparse(url)
     domain = parsed.netloc.lower().split(':')[0]  # strip port if present
 
@@ -142,29 +155,25 @@ with col_b2:
 if scan_button:
     if not url_input:
         st.toast("⚠️ Please enter a URL to scan.", icon="❌")
-
     elif model is None:
-        st.error("❌ System Error: model.pkl missing. Run the training pipeline first.")
-
+        st.error("❌ System Error: model.pkl missing. Run training pipeline.")
     else:
         with st.spinner("Analyzing domain signature via Random Forest..."):
 
-            parsed_url = urlparse(url_input)
+            clean_url = normalize_url(url_input)   # ← normalize first
+            parsed_url = urlparse(clean_url)
             domain = parsed_url.netloc.lower().split(':')[0]
 
-            # Heuristic override ONLY for raw IP domains — model handles HTTP via Feature 7
             is_ip = bool(re.search(r'^\d{1,3}(\.\d{1,3}){3}$', domain))
 
             if is_ip:
                 phishing_confidence = 0.99
                 source_label = "Heuristic (IP-based domain)"
             else:
-                ml_features = extract_url_features(url_input)
+                ml_features = extract_url_features(clean_url)  # ← clean_url here too
                 probabilities = model.predict_proba(ml_features)[0]
                 phishing_confidence = float(probabilities[1])
                 source_label = "Random Forest (12-feature)"
-
-        st.markdown("---")
 
         # ── Result Display ────────────────────────────────────────────────────
         if phishing_confidence > 0.7:
